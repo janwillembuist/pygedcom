@@ -30,10 +30,15 @@ class FamilyTree:
         self.individuals = {}
         self.families = {}
 
+        self.individual_amount = 0
+        self.family_amount = 0
+
     def add_individual(self, gedcomlines):
         # Save person ID in dict and pass data to Individual class
         self.individuals[gedcomlines[0].split('@')[1]] = Individual(gedcomlines)
+        self.individual_amount += 1
 
     def add_family(self, gedcomlines):
         # Save family ID in dict and pass data to Family class
         self.families[gedcomlines[0].split('@')[1]] = Family(gedcomlines)
+        self.family_amount += 1
