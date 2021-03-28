@@ -1,6 +1,8 @@
 
 class Individual:
-    pass
+    def __init__(self, gedcomlines):
+        pass
 
 class Family:
-    pass
+    def __init__(self, gedcomlines):
+        pass
