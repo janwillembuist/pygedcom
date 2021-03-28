@@ -22,4 +22,17 @@ class Individual:
 
 class Family:
     def __init__(self, gedcomlines):
-        pass
+        self.husband = None
+        self.wife = None
+        self.children = []
+
+        for line in gedcomlines:
+            if line.startswith('1 HUSB'):
+                self.husband = line.split('@')[1]
+            elif line.startswith('1 WIFE'):
+                self.wife = line.split('@')[1]
+            elif line.startswith('1 CHIL'):
+                self.children.append(line.split('@')[1])
+
+    def __str__(self):
+        return '{} & {}'.format(self.husband, self.wife)
