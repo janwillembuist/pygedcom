@@ -1,4 +1,3 @@
-import tkinter as tk
 from pygedcom.interface import App
 
 if __name__ == '__main__':

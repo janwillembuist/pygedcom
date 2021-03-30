@@ -39,6 +39,9 @@ class SearchFrame(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=3)
 
+        # Latest search results
+        self.search_results = []
+
         # Create widgets
         self.sv = tk.StringVar()
         self.sv.trace('w', lambda name, index, mode, sv=self.sv: self.on_type_callback())
@@ -51,14 +54,23 @@ class SearchFrame(ttk.Frame):
         keyword.grid(column=1, row=0)
 
         columns = ('#1', '#2')
-        search_list = ttk.Treeview(self, columns=columns, show='headings')
+        search_list = ttk.Treeview(self, columns=columns, show='headings', name='search_list')
         search_list.heading('#1', text='Full name')
         search_list.heading('#2', text='Backend ID')
         search_list.grid(column=0, row=1, columnspan=2)
 
     def on_type_callback(self):
-        results = self.nametowidget('.').tree.find(self.sv.get())
-        print(results)
+        self.search_results = self.nametowidget('.').tree.find(self.sv.get())
+        print(self.search_results)
+
+        # Delete all items
+        tree = self.nametowidget('search_list')
+        for child in tree.get_children():
+            tree.delete(child)
+
+        # Set new items
+        for res in self.search_results:
+            self.nametowidget('search_list').insert('', 0, values=(res, 'backend ID'))
 
 class InfoFrame(ttk.Frame):
     def __init__(self, master):
