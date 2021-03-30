@@ -1,3 +1,4 @@
+import re
 from pygedcom.elements import Individual, Family
 
 class Parser:
@@ -50,4 +51,4 @@ class FamilyTree:
         self.family_amount += 1
 
     def find(self, entrystr):
-        return [key for key in self.individuals_lookup.keys() if entrystr in key]
+        return [key for key in self.individuals_lookup.keys() if re.search(entrystr, key, re.IGNORECASE)]

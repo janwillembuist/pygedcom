@@ -45,32 +45,28 @@ class SearchFrame(ttk.Frame):
         # Create widgets
         self.sv = tk.StringVar()
         self.sv.trace('w', lambda name, index, mode, sv=self.sv: self.on_type_callback())
-        self.__create_widgets()
 
-    def __create_widgets(self):
         ttk.Label(self, text='Find person:').grid(column=0, row=0)
         keyword = ttk.Entry(self, width=30, textvariable=self.sv)
         keyword.focus()
         keyword.grid(column=1, row=0)
 
         columns = ('#1', '#2')
-        search_list = ttk.Treeview(self, columns=columns, show='headings', name='search_list')
-        search_list.heading('#1', text='Full name')
-        search_list.heading('#2', text='Backend ID')
-        search_list.grid(column=0, row=1, columnspan=2)
+        self.treeview_widget = ttk.Treeview(self, columns=columns, show='headings', name='search_list')
+        self.treeview_widget.heading('#1', text='Full name')
+        self.treeview_widget.heading('#2', text='Backend ID')
+        self.treeview_widget.grid(column=0, row=1, columnspan=2)
 
     def on_type_callback(self):
         self.search_results = self.nametowidget('.').tree.find(self.sv.get())
-        print(self.search_results)
 
         # Delete all items
-        tree = self.nametowidget('search_list')
-        for child in tree.get_children():
-            tree.delete(child)
+        for child in self.treeview_widget.get_children():
+            self.treeview_widget.delete(child)
 
         # Set new items
         for res in self.search_results:
-            self.nametowidget('search_list').insert('', 0, values=(res, 'backend ID'))
+            self.treeview_widget.insert('', 0, values=(res, 'backend ID'))
 
 class InfoFrame(ttk.Frame):
     def __init__(self, master):

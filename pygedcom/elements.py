@@ -9,7 +9,7 @@ class Individual:
         for line in gedcomlines:
             # Save stuff into class
             if line.startswith('1 NAME'):
-                self.fullname = line[7:-2]
+                self.fullname = line[7:-2].replace('/', '')
             elif line.startswith('1 SEX'):
                 self.sex = line[6]
             elif line.startswith('1 FAMS'):
