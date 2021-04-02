@@ -1,6 +1,7 @@
 # pygedcom
 
 [![License](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/janwillembuist/pygedcom/blob/main/LICENSE)
+
 My attempt at a GEDCOM viewer made with Python
 
 ## Example
