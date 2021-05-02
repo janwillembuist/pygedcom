@@ -54,7 +54,7 @@ class SearchFrame(ttk.Frame):
         columns = ('#1', '#2')
         self.treeview_widget = ttk.Treeview(self, columns=columns, show='headings', name='search_list')
         self.treeview_widget.heading('#1', text='Full name')
-        self.treeview_widget.heading('#2', text='Backend ID')
+        self.treeview_widget.heading('#2', text='Birth date')
         self.treeview_widget.grid(column=0, row=1, columnspan=2)
 
         self.select_button = ttk.Button(self, text='Select person', command=self.select_callback)
@@ -68,8 +68,8 @@ class SearchFrame(ttk.Frame):
             self.treeview_widget.delete(child)
 
         # Set new items
-        for res in self.search_results:
-            self.treeview_widget.insert('', 0, values=(res, 'backend ID'))
+        for person in self.search_results:
+            self.treeview_widget.insert('', 0, values=(person.fullname, person.birthdate))
 
     def select_callback(self):
         selected = self.treeview_widget.focus()

@@ -51,4 +51,7 @@ class FamilyTree:
         self.family_amount += 1
 
     def find(self, entrystr):
-        return [key for key in self.individuals_lookup.keys() if re.search(entrystr, key, re.IGNORECASE)]
+        return [self.select_person(key) for key in self.individuals_lookup.keys() if re.search(entrystr, key, re.IGNORECASE)]
+
+    def select_person(self, name):
+        return self.individuals[self.individuals_lookup[name]]
