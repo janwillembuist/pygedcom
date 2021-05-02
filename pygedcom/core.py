@@ -2,6 +2,7 @@ import re
 from pygedcom.elements import Individual, Family
 
 class Parser:
+    """Parses the raw gedcom file into a Pygedcom FamilyTree instance"""
     def __init__(self, file):
         with open(file, mode='r', encoding='utf-8-sig') as f:
             self.lines = f.readlines()
@@ -27,6 +28,7 @@ class Parser:
         return tree
 
 class FamilyTree:
+    """Pygedcom's representation of a family tree."""
     def __init__(self):
         # key: ID, value: Individual/Family
         self.individuals = {}
@@ -51,7 +53,24 @@ class FamilyTree:
         self.family_amount += 1
 
     def find(self, entrystr):
-        return [self.select_person(key) for key in self.individuals_lookup.keys() if re.search(entrystr, key, re.IGNORECASE)]
+        """Returns a list of individuals for a given Search query.
 
-    def select_person(self, name):
-        return self.individuals[self.individuals_lookup[name]]
+        Currently searches the individuals_lookup dictionary, which containts fullnames of the Individuals inside the
+        FamilyTree.
+
+        Speed could be optimized here by implementing a trie for example.
+        :param str entrystr: Search query
+        :return: List of individuals
+        :rtype: list
+        """
+        return [self.select_person(key)
+                for key in self.individuals_lookup.keys() if re.search(entrystr, key, re.IGNORECASE)]
+
+    def select_person(self, fullname):
+        """ Selects person from fullname
+
+        :param str fullname: Fullname of person
+        :return: Individual class
+        :rtype: Individual
+        """
+        return self.individuals[self.individuals_lookup[fullname]]
