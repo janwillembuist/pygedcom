@@ -5,7 +5,7 @@ from pygedcom.core import Parser
 
 class App(tk.Tk):
     FRAME_OPTIONS = {
-        'borderwidth': 2,
+        'borderwidth': 1,
         'padding': '0.5i',
         'relief': 'groove'}
 
@@ -18,8 +18,8 @@ class App(tk.Tk):
 
         # Layout
         self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=4)
-        self.rowconfigure(0, weight=4)
+        self.columnconfigure(1, weight=5)
+        self.rowconfigure(0, weight=5)
         self.rowconfigure(1, weight=1)
 
         # Load data
@@ -93,18 +93,40 @@ class InfoFrame(ttk.Frame):
         super().__init__(master, **kwargs)
 
         # Layout
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=2)
+        self.columnconfigure(2, weight=1)
+        self.columnconfigure(3, weight=2)
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
 
         # Markup info
-        self.infostring = tk.StringVar()
-        self.infostring.set('None')
+        self.fullname = tk.StringVar()
+        self.fullname.set('None')
+        self.sex = tk.StringVar()
+        self.sex.set('None')
+        self.birthdate = tk.StringVar()
+        self.birthdate.set('None')
+        self.deathdate = tk.StringVar()
+        self.deathdate.set('None')
 
         # Create widgets
-        self.label = ttk.Label(self, textvariable=self.infostring)
-        self.label.pack()
+        ttk.Label(self, text='Full name:').grid(column=0, row=0, sticky='e')
+        ttk.Label(self, text='Sex:').grid(column=0, row=1, sticky='e')
+        ttk.Label(self, text='Date of birth:').grid(column=2, row=0, sticky='e')
+        ttk.Label(self, text='Date of death:').grid(column=2, row=1, sticky='e')
+        ttk.Label(self, textvariable=self.fullname).grid(column=1, row=0, sticky='w')
+        ttk.Label(self, textvariable=self.sex).grid(column=1, row=1, sticky='w')
+        ttk.Label(self, textvariable=self.birthdate).grid(column=3, row=0, sticky='w')
+        ttk.Label(self, textvariable=self.deathdate).grid(column=3, row=1, sticky='w')
 
     def update_callback(self, person_id):
         individual = self.nametowidget('.').tree.individuals[person_id]
-        self.infostring.set(individual)
+        self.fullname.set(individual.fullname)
+        self.sex.set(individual.sex)
+        self.birthdate.set(individual.birthdate)
+        self.deathdate.set(individual.deathdate)
+        print(vars(individual))
 
 class MainFrame(ttk.Frame):
     def __init__(self, master, **kwargs):

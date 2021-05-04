@@ -12,6 +12,7 @@ class Individual:
         in_deat = False
 
         for line in gedcomlines:
+            line = line.strip()
             if in_birt:
                 if line.startswith('2 DATE'):
                     self.birthdate = line[7:]
@@ -26,7 +27,7 @@ class Individual:
 
             # Save stuff into class
             if line.startswith('1 NAME'):
-                self.fullname = line[7:-2].replace('/', '')
+                self.fullname = line[7:].replace('/', '')
             elif line.startswith('1 SEX'):
                 self.sex = line[6]
             elif line.startswith('1 FAMS'):
