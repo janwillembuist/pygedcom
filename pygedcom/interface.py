@@ -45,6 +45,7 @@ class SearchFrame(ttk.Frame):
         # Layout
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
+        #self.columnconfigure(2, weight=1)
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=5)
         self.rowconfigure(2, weight=1)
@@ -65,7 +66,14 @@ class SearchFrame(ttk.Frame):
         self.treeview_widget = ttk.Treeview(self, columns=columns, show='headings', name='search_list')
         self.treeview_widget.heading('#1', text='Full name')
         self.treeview_widget.heading('#2', text='Birth date')
-        self.treeview_widget.grid(column=0, row=1, columnspan=2, sticky='nesw')
+        self.treeview_widget.grid(column=0, row=1, columnspan=2, sticky='nsew')
+
+        # Create scrollbar
+        self.scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.treeview_widget.yview)
+        self.scrollbar.grid(column=2, row=1, sticky='ns')
+
+        # Couple scrollbar
+        self.treeview_widget.configure(yscrollcommand=self.scrollbar.set)
 
         self.select_button = ttk.Button(self, text='Select person', command=self.select_callback)
         self.select_button.grid(column=0, row=2, columnspan=2, sticky='we')
