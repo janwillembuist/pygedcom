@@ -86,11 +86,10 @@ class SearchFrame(ttk.Frame):
         selected = self.treeview_widget.item(selected)['values'][0]
 
         # Find corresponding ID and save in main app
-        person_id = self.nametowidget('.').tree.individuals_lookup[selected]
-        self.nametowidget('.').selected_individual = person_id
+        self.nametowidget('.').selected_individual = self.nametowidget('.').tree.individuals_lookup[selected]
 
         # Update info and main frame
-        self.nametowidget('.!infoframe').update_callback(person_id)
+        self.nametowidget('.!infoframe').update_callback()
 
 
 class InfoFrame(ttk.Frame):
@@ -99,9 +98,9 @@ class InfoFrame(ttk.Frame):
 
         # Layout
         self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1)
+        self.columnconfigure(1, weight=2)
         self.columnconfigure(2, weight=1)
-        self.columnconfigure(3, weight=1)
+        self.columnconfigure(3, weight=2)
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
 
@@ -120,13 +119,13 @@ class InfoFrame(ttk.Frame):
         ttk.Label(self, text='Sex:').grid(column=0, row=1, sticky='e')
         ttk.Label(self, text='Date of birth:').grid(column=2, row=0, sticky='e')
         ttk.Label(self, text='Date of death:').grid(column=2, row=1, sticky='e')
-        ttk.Label(self, textvariable=self.fullname).grid(column=1, row=0, sticky='w')
-        ttk.Label(self, textvariable=self.sex).grid(column=1, row=1, sticky='w')
-        ttk.Label(self, textvariable=self.birthdate).grid(column=3, row=0, sticky='w')
-        ttk.Label(self, textvariable=self.deathdate).grid(column=3, row=1, sticky='w')
+        ttk.Label(self, textvariable=self.fullname).grid(column=1, row=0, sticky='we')
+        ttk.Label(self, textvariable=self.sex).grid(column=1, row=1, sticky='we')
+        ttk.Label(self, textvariable=self.birthdate).grid(column=3, row=0, sticky='we')
+        ttk.Label(self, textvariable=self.deathdate).grid(column=3, row=1, sticky='we')
 
-    def update_callback(self, person_id):
-        individual = self.nametowidget('.').tree.individuals[person_id]
+    def update_callback(self):
+        individual = self.nametowidget('.').tree.individuals[self.nametowidget('.').selected_individual]
         self.fullname.set(individual.fullname)
         self.sex.set(individual.sex)
         self.birthdate.set(individual.birthdate)
