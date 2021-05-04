@@ -8,10 +8,19 @@ class Individual:
         self.upperfam = None
         self.lowerfam = None
 
+        # Fill info
+        self._scan_input(gedcomlines)
+
+    def __str__(self):
+        return '{}, {}'.format(self.fullname, self.sex)
+
+    def _scan_input(self, gedcomlines):
+        # Analyze input to fill Individual's attributes line by line
         in_birt = False
         in_deat = False
 
         for line in gedcomlines:
+            # Cut of newlines and spaces
             line = line.strip()
             if in_birt:
                 if line.startswith('2 DATE'):
@@ -39,8 +48,6 @@ class Individual:
             elif line.startswith('1 DEAT'):
                 in_deat = True
 
-    def __str__(self):
-        return '{}, {}'.format(self.fullname, self.sex)
 
 class Family:
     def __init__(self, gedcomlines):
@@ -48,6 +55,13 @@ class Family:
         self.wife = None
         self.children = []
 
+        # Get attributes
+        self._scan_input(gedcomlines)
+
+    def __str__(self):
+        return '{} & {}'.format(self.husband, self.wife)
+
+    def _scan_input(self, gedcomlines):
         for line in gedcomlines:
             if line.startswith('1 HUSB'):
                 self.husband = line.split('@')[1]
@@ -55,6 +69,3 @@ class Family:
                 self.wife = line.split('@')[1]
             elif line.startswith('1 CHIL'):
                 self.children.append(line.split('@')[1])
-
-    def __str__(self):
-        return '{} & {}'.format(self.husband, self.wife)
