@@ -6,14 +6,16 @@ from pygedcom.core import Parser
 class App(tk.Tk):
     FRAME_OPTIONS = {
         'borderwidth': 1,
-        'padding': '0.5i',
-        'relief': 'groove'}
+        'relief': 'groove',
+        'padding': '0.2i'
+    }
 
     def __init__(self, gedcomfile):
         super().__init__()
 
         # Window settings
         self.geometry("1240x720")
+        self.resizable(width=False, height=False)
         self.title('PyGEDCOM')
 
         # Layout
@@ -30,11 +32,11 @@ class App(tk.Tk):
 
         # Create subframes
         self.search_frame = SearchFrame(self, **self.FRAME_OPTIONS)
-        self.search_frame.grid(column=0, row=0, rowspan=2)
+        self.search_frame.grid(column=0, row=0, rowspan=2, sticky='nesw')
         self.main_frame = MainFrame(self, **self.FRAME_OPTIONS)
-        self.main_frame.grid(column=1, row=0)
+        self.main_frame.grid(column=1, row=0, sticky='nesw')
         self.info_frame = InfoFrame(self, **self.FRAME_OPTIONS)
-        self.info_frame.grid(column=1, row=1)
+        self.info_frame.grid(column=1, row=1, sticky='nesw')
 
 class SearchFrame(ttk.Frame):
     def __init__(self, master, **kwargs):
@@ -42,7 +44,10 @@ class SearchFrame(ttk.Frame):
 
         # Layout
         self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=3)
+        self.columnconfigure(1, weight=1)
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=5)
+        self.rowconfigure(2, weight=1)
 
         # Latest search results
         self.search_results = []
@@ -52,18 +57,18 @@ class SearchFrame(ttk.Frame):
         self.sv.trace('w', lambda name, index, mode, sv=self.sv: self.on_type_callback())
 
         ttk.Label(self, text='Find person:').grid(column=0, row=0)
-        keyword = ttk.Entry(self, width=30, textvariable=self.sv)
+        keyword = ttk.Entry(self, textvariable=self.sv)
         keyword.focus()
-        keyword.grid(column=1, row=0)
+        keyword.grid(column=1, row=0, sticky='we')
 
         columns = ('#1', '#2')
         self.treeview_widget = ttk.Treeview(self, columns=columns, show='headings', name='search_list')
         self.treeview_widget.heading('#1', text='Full name')
         self.treeview_widget.heading('#2', text='Birth date')
-        self.treeview_widget.grid(column=0, row=1, columnspan=2)
+        self.treeview_widget.grid(column=0, row=1, columnspan=2, sticky='nesw')
 
         self.select_button = ttk.Button(self, text='Select person', command=self.select_callback)
-        self.select_button.grid(column=0, row=2)
+        self.select_button.grid(column=0, row=2, columnspan=2, sticky='we')
 
     def on_type_callback(self):
         self.search_results = self.nametowidget('.').tree.find(self.sv.get())
@@ -94,9 +99,9 @@ class InfoFrame(ttk.Frame):
 
         # Layout
         self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=2)
+        self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=1)
-        self.columnconfigure(3, weight=2)
+        self.columnconfigure(3, weight=1)
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
 
@@ -126,7 +131,6 @@ class InfoFrame(ttk.Frame):
         self.sex.set(individual.sex)
         self.birthdate.set(individual.birthdate)
         self.deathdate.set(individual.deathdate)
-        print(vars(individual))
 
 class MainFrame(ttk.Frame):
     def __init__(self, master, **kwargs):
