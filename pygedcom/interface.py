@@ -4,6 +4,11 @@ from pygedcom.core import Parser
 
 
 class App(tk.Tk):
+    FRAME_OPTIONS = {
+        'borderwidth': 2,
+        'padding': '0.5i',
+        'relief': 'groove'}
+
     def __init__(self, gedcomfile):
         super().__init__()
 
@@ -24,16 +29,16 @@ class App(tk.Tk):
         self.selected_individual = None
 
         # Create subframes
-        self.search_frame = SearchFrame(self)
+        self.search_frame = SearchFrame(self, **self.FRAME_OPTIONS)
         self.search_frame.grid(column=0, row=0, rowspan=2)
-        self.main_frame = MainFrame(self)
+        self.main_frame = MainFrame(self, **self.FRAME_OPTIONS)
         self.main_frame.grid(column=1, row=0)
-        self.info_frame = InfoFrame(self)
+        self.info_frame = InfoFrame(self, **self.FRAME_OPTIONS)
         self.info_frame.grid(column=1, row=1)
 
 class SearchFrame(ttk.Frame):
-    def __init__(self, master):
-        super().__init__(master)
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
 
         # Layout
         self.columnconfigure(0, weight=1)
@@ -84,8 +89,10 @@ class SearchFrame(ttk.Frame):
 
 
 class InfoFrame(ttk.Frame):
-    def __init__(self, master):
-        super().__init__(master)
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
+
+        # Layout
 
         # Markup info
         self.infostring = tk.StringVar()
@@ -100,11 +107,7 @@ class InfoFrame(ttk.Frame):
         self.infostring.set(individual)
 
 class MainFrame(ttk.Frame):
-    def __init__(self, master):
-        super().__init__(master)
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
 
         # Create widgets
-        self.__create_widgets()
-
-    def __create_widgets(self):
-        pass

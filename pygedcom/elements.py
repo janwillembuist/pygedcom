@@ -13,7 +13,6 @@ class Individual:
 
         for line in gedcomlines:
             if in_birt:
-                print('inbirt')
                 if line.startswith('2 DATE'):
                     self.birthdate = line[7:]
                 elif line.startswith('1'):
