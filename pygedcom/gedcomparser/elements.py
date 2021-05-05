@@ -2,6 +2,7 @@ import re
 
 class Individual:
     def __init__(self, gedcomlines):
+        # TODO: more info!
         self.fullname = None
         self.sex = None
         self.birthdate = None

@@ -63,6 +63,7 @@ class SearchFrame(ttk.Frame):
         keyword.focus()
         keyword.grid(column=1, row=0, sticky='we')
 
+        # TODO: double click callback
         columns = ('#1', '#2')
         self.treeview_widget = ttk.Treeview(self, columns=columns, show='headings', name='search_list')
         self.treeview_widget.heading('#1', text='Full name')
