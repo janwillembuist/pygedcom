@@ -1,7 +1,12 @@
+# External imports
 import tkinter as tk
 from tkinter import ttk
-from pygedcom.core import Parser
+from matplotlib import pyplot as plt
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
+# Internal imports
+from pygedcom import treeplot as treeplt
+from pygedcom.gedcomparser import Parser
 
 class App(tk.Tk):
     FRAME_OPTIONS = {
@@ -27,9 +32,6 @@ class App(tk.Tk):
         # Load data
         self.tree = Parser(gedcomfile).build_tree()
 
-        # Placeholder for selected person
-        self.selected_individual = None
-
         # Create subframes
         self.search_frame = SearchFrame(self, **self.FRAME_OPTIONS)
         self.search_frame.grid(column=0, row=0, rowspan=2, sticky='nesw')
@@ -45,7 +47,6 @@ class SearchFrame(ttk.Frame):
         # Layout
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
-        #self.columnconfigure(2, weight=1)
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=5)
         self.rowconfigure(2, weight=1)
@@ -62,6 +63,7 @@ class SearchFrame(ttk.Frame):
         keyword.focus()
         keyword.grid(column=1, row=0, sticky='we')
 
+        # TODO: double click callback
         columns = ('#1', '#2')
         self.treeview_widget = ttk.Treeview(self, columns=columns, show='headings', name='search_list')
         self.treeview_widget.heading('#1', text='Full name')
@@ -94,10 +96,13 @@ class SearchFrame(ttk.Frame):
         selected = self.treeview_widget.item(selected)['values'][0]
 
         # Find corresponding ID and save in main app
-        self.nametowidget('.').selected_individual = self.nametowidget('.').tree.individuals_lookup[selected]
+        # TODO: make this understandable and maybe quicker.
+        self.nametowidget('.').tree.selected_individual = self.nametowidget('.').tree.individuals[
+            self.nametowidget('.').tree.individuals_lookup[selected]]
 
         # Update info and main frame
         self.nametowidget('.!infoframe').update_callback()
+        self.nametowidget('.!mainframe').update_callback()
 
 
 class InfoFrame(ttk.Frame):
@@ -133,7 +138,7 @@ class InfoFrame(ttk.Frame):
         ttk.Label(self, textvariable=self.deathdate).grid(column=3, row=1, sticky='we')
 
     def update_callback(self):
-        individual = self.nametowidget('.').tree.individuals[self.nametowidget('.').selected_individual]
+        individual = self.nametowidget('.').tree.selected_individual
         self.fullname.set(individual.fullname)
         self.sex.set(individual.sex)
         self.birthdate.set(individual.birthdate)
@@ -144,3 +149,12 @@ class MainFrame(ttk.Frame):
         super().__init__(master, **kwargs)
 
         # Create widgets
+        self.fig = plt.Figure()
+        self.plot = self.fig.add_subplot(111)
+        self.canvas = FigureCanvasTkAgg(self.fig, self)
+        self.toolbar = NavigationToolbar2Tk(self.canvas, self)
+        self.canvas.get_tk_widget().pack(fill=tk.BOTH)
+
+    def update_callback(self):
+        treeplt.plot_tree(self.nametowidget('.').tree, self.plot)
+        self.canvas.draw()

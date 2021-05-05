@@ -1,6 +1,8 @@
+import re
 
 class Individual:
     def __init__(self, gedcomlines):
+        # TODO: more info!
         self.fullname = None
         self.sex = None
         self.birthdate = None
@@ -69,3 +71,55 @@ class Family:
                 self.wife = line.split('@')[1]
             elif line.startswith('1 CHIL'):
                 self.children.append(line.split('@')[1])
+
+class FamilyTree:
+    """Pygedcom's representation of a family tree."""
+    def __init__(self):
+        # key: ID, value: Individual/Family
+        self.individuals = {}
+        self.families = {}
+
+        # key: Individual.fullname, value: ID
+        self.individuals_lookup = {}
+
+        # The selected person
+        # TODO: make this a property
+        self.selected_individual = None
+
+        self.individual_amount = 0
+        self.family_amount = 0
+
+    def add_individual(self, gedcomlines):
+        # Save person ID in dict and pass data to Individual class, save fullname to lookup table
+        person_id = gedcomlines[0].split('@')[1]
+        self.individuals[person_id] = Individual(gedcomlines)
+        self.individuals_lookup[self.individuals[person_id].fullname] = person_id
+        self.individual_amount += 1
+
+    def add_family(self, gedcomlines):
+        # Save family ID in dict and pass data to Family class
+        self.families[gedcomlines[0].split('@')[1]] = Family(gedcomlines)
+        self.family_amount += 1
+
+    def find(self, entrystr):
+        """Returns a list of individuals for a given Search query.
+
+        Currently searches the individuals_lookup dictionary, which containts fullnames of the Individuals inside the
+        FamilyTree.
+
+        Speed could be optimized here by implementing a trie for example.
+        :param str entrystr: Search query
+        :return: List of individuals
+        :rtype: list
+        """
+        return [self.select_person(key)
+                for key in self.individuals_lookup.keys() if re.search(entrystr, key, re.IGNORECASE)]
+
+    def select_person(self, fullname):
+        """ Selects person from fullname
+
+        :param str fullname: Fullname of person
+        :return: Individual class
+        :rtype: Individual
+        """
+        return self.individuals[self.individuals_lookup[fullname]]
