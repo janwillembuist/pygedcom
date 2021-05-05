@@ -83,11 +83,21 @@ class FamilyTree:
         self.individuals_lookup = {}
 
         # The selected person
-        # TODO: make this a property
-        self.selected_individual = None
+        self._selected_individual = None
 
         self.individual_amount = 0
         self.family_amount = 0
+
+    @property
+    def selected_individual(self):
+        return self._selected_individual
+
+    @selected_individual.setter
+    def selected_individual(self, value):
+        if isinstance(value, Individual):
+            self._selected_individual = value
+        else:
+            raise AssertionError('Not a valid Individual')
 
     def add_individual(self, gedcomlines):
         # Save person ID in dict and pass data to Individual class, save fullname to lookup table
