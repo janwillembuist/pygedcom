@@ -1,7 +1,12 @@
+# External imports
 import tkinter as tk
 from tkinter import ttk
-from pygedcom.core import Parser
+from matplotlib import pyplot as plt
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
+# Internal imports
+from pygedcom import treeplot as treeplt
+from pygedcom.gedcomparser import Parser
 
 class App(tk.Tk):
     FRAME_OPTIONS = {
@@ -45,7 +50,6 @@ class SearchFrame(ttk.Frame):
         # Layout
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
-        #self.columnconfigure(2, weight=1)
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=5)
         self.rowconfigure(2, weight=1)
@@ -98,6 +102,7 @@ class SearchFrame(ttk.Frame):
 
         # Update info and main frame
         self.nametowidget('.!infoframe').update_callback()
+        self.nametowidget('.!mainframe').update_callback()
 
 
 class InfoFrame(ttk.Frame):
@@ -144,3 +149,13 @@ class MainFrame(ttk.Frame):
         super().__init__(master, **kwargs)
 
         # Create widgets
+        self.fig = plt.Figure()
+        self.plot = self.fig.add_subplot(111)
+        self.canvas = FigureCanvasTkAgg(self.fig, self)
+        self.toolbar = NavigationToolbar2Tk(self.canvas, self)
+        self.canvas.get_tk_widget().pack(fill=tk.BOTH)
+
+    def update_callback(self):
+        tree = 5
+        treeplt.plot_tree(tree, self.plot)
+        self.canvas.draw()
