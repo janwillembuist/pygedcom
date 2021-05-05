@@ -32,9 +32,6 @@ class App(tk.Tk):
         # Load data
         self.tree = Parser(gedcomfile).build_tree()
 
-        # Placeholder for selected person
-        self.selected_individual = None
-
         # Create subframes
         self.search_frame = SearchFrame(self, **self.FRAME_OPTIONS)
         self.search_frame.grid(column=0, row=0, rowspan=2, sticky='nesw')
@@ -98,7 +95,9 @@ class SearchFrame(ttk.Frame):
         selected = self.treeview_widget.item(selected)['values'][0]
 
         # Find corresponding ID and save in main app
-        self.nametowidget('.').selected_individual = self.nametowidget('.').tree.individuals_lookup[selected]
+        # TODO: make this understandable and maybe quicker.
+        self.nametowidget('.').tree.selected_individual = self.nametowidget('.').tree.individuals[
+            self.nametowidget('.').tree.individuals_lookup[selected]]
 
         # Update info and main frame
         self.nametowidget('.!infoframe').update_callback()
@@ -138,7 +137,7 @@ class InfoFrame(ttk.Frame):
         ttk.Label(self, textvariable=self.deathdate).grid(column=3, row=1, sticky='we')
 
     def update_callback(self):
-        individual = self.nametowidget('.').tree.individuals[self.nametowidget('.').selected_individual]
+        individual = self.nametowidget('.').tree.selected_individual
         self.fullname.set(individual.fullname)
         self.sex.set(individual.sex)
         self.birthdate.set(individual.birthdate)
@@ -156,6 +155,5 @@ class MainFrame(ttk.Frame):
         self.canvas.get_tk_widget().pack(fill=tk.BOTH)
 
     def update_callback(self):
-        tree = 5
-        treeplt.plot_tree(tree, self.plot)
+        treeplt.plot_tree(self.nametowidget('.').tree, self.plot)
         self.canvas.draw()

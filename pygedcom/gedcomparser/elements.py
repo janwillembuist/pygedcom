@@ -81,6 +81,10 @@ class FamilyTree:
         # key: Individual.fullname, value: ID
         self.individuals_lookup = {}
 
+        # The selected person
+        # TODO: make this a property
+        self.selected_individual = None
+
         self.individual_amount = 0
         self.family_amount = 0
 
