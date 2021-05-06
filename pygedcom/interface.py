@@ -156,5 +156,7 @@ class MainFrame(ttk.Frame):
         self.canvas.get_tk_widget().pack(fill=tk.BOTH)
 
     def update_callback(self):
-        treeplt.plot_tree(self.nametowidget('.').tree, self.plot)
+        tree = self.nametowidget('.').tree.find_ancestors()
+        print(tree)
+        treeplt.plot_tree(tree, self.plot)
         self.canvas.draw()

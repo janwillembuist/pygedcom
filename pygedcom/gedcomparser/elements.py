@@ -133,3 +133,13 @@ class FamilyTree:
         :rtype: Individual
         """
         return self.individuals[self.individuals_lookup[fullname]]
+
+    def find_ancestors(self, tree_list=None, level=2):
+        if tree_list is None:
+            tree_list = [[[1, self.selected_individual.fullname]]]
+
+        fam = self.families[self.selected_individual.upperfam]
+
+        tree_list.append([[2, fam.husband], [3, fam.wife]])
+
+        return tree_list

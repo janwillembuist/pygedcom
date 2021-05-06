@@ -11,14 +11,19 @@ def plot_tree(tree, ax=None):
 
     # Clear old plot if it exists
     ax.clear()
-    ax.text(
-        1,
-        1,
-        tree.selected_individual.fullname,
-        bbox=BBOX,
-        fontsize=15,
-        ha='center',
-        va='center',
-    )
-    ax.set_xlim([0, 10])
+    gen_level = 1
+
+    for generation in tree:
+        for person in generation:
+            ax.text(
+                1,
+                gen_level,
+                person[1],
+                bbox=BBOX,
+                fontsize=15,
+                ha='center',
+                va='center',
+            )
+        gen_level += 2
+    ax.set_xlim([-10, 10])
     ax.set_ylim([0, 10])
