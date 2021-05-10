@@ -3,10 +3,12 @@ import re
 class Individual:
     def __init__(self, gedcomlines):
         # TODO: more info!
-        self.fullname = None
-        self.sex = None
-        self.birthdate = None
-        self.deathdate = None
+        self.fullname = 'None'
+        self.firstname = 'None'
+        self.lastname = 'None'
+        self.sex = 'None'
+        self.birthdate = 'None'
+        self.deathdate = 'None'
         self.upperfam = None
         self.lowerfam = None
 
@@ -49,6 +51,10 @@ class Individual:
                 in_birt = True
             elif line.startswith('1 DEAT'):
                 in_deat = True
+            elif line.startswith('2 SURN'):
+                self.lastname = line[7:]
+            elif line.startswith('2 GIVN'):
+                self.firstname = line[7:]
 
     def serialize_individual(self, families):
         if self.upperfam is not None:
@@ -151,22 +157,35 @@ class FamilyTree:
         """
         return self.individuals[self.individuals_lookup[fullname]]
 
-    def find_ancestors(self, tree_list=None, level=2):
+    def find_ancestors(self, tree_list=None, depth=2):
         if tree_list is None:
-            tree_list = [[[1, self.selected_individual.fullname]]]
-            fam = self.selected_individual.upperfam
+            level = 1
+            tree_list = [[[level, self.selected_individual.firstname + '\n' + self.selected_individual.lastname]]]
+            fams = [[None, self.selected_individual.upperfam]]
         else:
-            fam = tree_list[0][0][1]
-        if isinstance(fam, Family):
-            if isinstance(fam.husband, Individual):
-                father = fam.husband.fullname
+            fams = tree_list[0]
+            level = fams[0][0]
+
+        level *= 2
+        generation = []
+        for fam in fams:
+            fam = fam[1]
+            if isinstance(fam, Family):
+                if isinstance(fam.husband, Individual):
+                    father = fam.husband.firstname + '\n' + fam.husband.lastname
+                else:
+                    father = None
+                if isinstance(fam.wife, Individual):
+                    mother = fam.wife.firstname + '\n' + fam.wife.lastname
+                else:
+                    mother = None
+                generation.append([level, father])
+                generation.append([level + 1, mother])
             else:
-                father = None
-            if isinstance(fam.wife, Individual):
-                mother = fam.wife.fullname
-            else:
-                mother = None
-            tree_list.append([[2, father], [3, mother]])
+                tree_list.append([[level, None], [level + 1, None]])
+
+            level += 2
+        tree_list.append(generation)
 
         return tree_list
 
