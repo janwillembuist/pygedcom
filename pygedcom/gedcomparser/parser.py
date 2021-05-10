@@ -24,4 +24,8 @@ class Parser:
             elif 'FAM' in title:
                 # Add family to the tree with this part of the file
                 tree.add_family(self.lines[line:self.separators[i+1][0]])
+
+        # Serialize tree
+        tree.serialize()
+
         return tree

@@ -150,13 +150,12 @@ class MainFrame(ttk.Frame):
 
         # Create widgets
         self.fig = plt.Figure()
-        self.plot = self.fig.add_subplot(111)
+        self.plotaxis = self.fig.add_subplot(111)
         self.canvas = FigureCanvasTkAgg(self.fig, self)
         self.toolbar = NavigationToolbar2Tk(self.canvas, self)
         self.canvas.get_tk_widget().pack(fill=tk.BOTH)
 
     def update_callback(self):
         tree = self.nametowidget('.').tree.find_ancestors()
-        print(tree)
-        treeplt.plot_tree(tree, self.plot)
+        treeplt.plot_tree(tree, self.plotaxis)
         self.canvas.draw()

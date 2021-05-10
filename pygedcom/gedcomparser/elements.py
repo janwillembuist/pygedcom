@@ -50,6 +50,12 @@ class Individual:
             elif line.startswith('1 DEAT'):
                 in_deat = True
 
+    def serialize_individual(self, families):
+        if self.upperfam is not None:
+            self.upperfam = families[self.upperfam]
+        if self.lowerfam is not None:
+            self.lowerfam = families[self.lowerfam]
+
 
 class Family:
     def __init__(self, gedcomlines):
@@ -71,6 +77,17 @@ class Family:
                 self.wife = line.split('@')[1]
             elif line.startswith('1 CHIL'):
                 self.children.append(line.split('@')[1])
+
+    def serialize_family(self, individuals):
+        if self.husband is not None:
+            self.husband = individuals[self.husband]
+        if self.wife is not None:
+            self.wife = individuals[self.wife]
+        if len(self.children) > 0:
+            newkids = []
+            for child in self.children:
+                newkids.append(individuals[child])
+            self.children = newkids
 
 class FamilyTree:
     """Pygedcom's representation of a family tree."""
@@ -137,9 +154,26 @@ class FamilyTree:
     def find_ancestors(self, tree_list=None, level=2):
         if tree_list is None:
             tree_list = [[[1, self.selected_individual.fullname]]]
-
-        fam = self.families[self.selected_individual.upperfam]
-
-        tree_list.append([[2, fam.husband], [3, fam.wife]])
+            fam = self.selected_individual.upperfam
+        else:
+            fam = tree_list[0][0][1]
+        if isinstance(fam, Family):
+            if isinstance(fam.husband, Individual):
+                father = fam.husband.fullname
+            else:
+                father = None
+            if isinstance(fam.wife, Individual):
+                mother = fam.wife.fullname
+            else:
+                mother = None
+            tree_list.append([[2, father], [3, mother]])
 
         return tree_list
+
+    def serialize(self):
+        for fam_id, family in self.families.items():
+            self.families[fam_id].serialize_family(self.individuals)
+
+        for ind_id, individual in self.individuals.items():
+            self.individuals[ind_id].serialize_individual(self.families)
+
