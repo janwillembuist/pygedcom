@@ -20,8 +20,7 @@ def plot_tree(tree, ax=None):
             x = np.linspace(-gen_level, gen_level, person_amount)
         else:
             x = [0]
-        print(generation)
-        print(x)
+
         for person, dx in zip(generation, x):
             ax.text(
                 dx,
