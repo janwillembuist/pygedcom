@@ -155,6 +155,9 @@ class MainFrame(ttk.Frame):
         self.toolbar = NavigationToolbar2Tk(self.canvas, self)
         self.canvas.get_tk_widget().pack(fill=tk.BOTH)
 
+        # Preconfigure plot window
+        self.plotaxis.axis('off')
+
     def update_callback(self):
         tree = self.nametowidget('.').tree.find_ancestors()
         treeplt.plot_tree(tree, self.plotaxis)

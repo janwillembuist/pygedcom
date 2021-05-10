@@ -3,12 +3,12 @@ import re
 class Individual:
     def __init__(self, gedcomlines):
         # TODO: more info!
-        self.fullname = 'None'
-        self.firstname = 'None'
-        self.lastname = 'None'
-        self.sex = 'None'
-        self.birthdate = 'None'
-        self.deathdate = 'None'
+        self.fullname = ''
+        self.firstname = ''
+        self.lastname = ''
+        self.sex = ''
+        self.birthdate = ''
+        self.deathdate = ''
         self.upperfam = None
         self.lowerfam = None
 
@@ -126,6 +126,19 @@ class FamilyTree:
         # Save person ID in dict and pass data to Individual class, save fullname to lookup table
         person_id = gedcomlines[0].split('@')[1]
         self.individuals[person_id] = Individual(gedcomlines)
+
+        # Add number if this fullname is allready in the lookup table
+        i = 1
+        while self.individuals[person_id].fullname in self.individuals_lookup:
+            if self.individuals[person_id].fullname.endswith('({})'.format(i-1)):
+                # Delete previous number
+                self.individuals[person_id].fullname = self.individuals[person_id].fullname[:-4]
+                self.individuals[person_id].lastname = self.individuals[person_id].lastname[:-4]
+            self.individuals[person_id].fullname += ' ({})'.format(i)
+            self.individuals[person_id].lastname += ' ({})'.format(i)
+            i += 1
+
+        # Add person to lookup table
         self.individuals_lookup[self.individuals[person_id].fullname] = person_id
         self.individual_amount += 1
 
@@ -157,35 +170,42 @@ class FamilyTree:
         """
         return self.individuals[self.individuals_lookup[fullname]]
 
-    def find_ancestors(self, tree_list=None, depth=2):
-        if tree_list is None:
-            level = 1
-            tree_list = [[[level, self.selected_individual.firstname + '\n' + self.selected_individual.lastname]]]
-            fams = [[None, self.selected_individual.upperfam]]
-        else:
-            fams = tree_list[0]
-            level = fams[0][0]
+    def find_ancestors(self, depth=5):
+        counter = 1
+        tree_list = [[[counter, self.selected_individual.firstname + '\n' + self.selected_individual.lastname]]]
+        counter += 1
 
-        level *= 2
-        generation = []
-        for fam in fams:
-            fam = fam[1]
-            if isinstance(fam, Family):
-                if isinstance(fam.husband, Individual):
-                    father = fam.husband.firstname + '\n' + fam.husband.lastname
-                else:
-                    father = None
-                if isinstance(fam.wife, Individual):
-                    mother = fam.wife.firstname + '\n' + fam.wife.lastname
-                else:
-                    mother = None
-                generation.append([level, father])
-                generation.append([level + 1, mother])
-            else:
-                tree_list.append([[level, None], [level + 1, None]])
+        generation = [self.selected_individual]
 
-            level += 2
-        tree_list.append(generation)
+        while depth != 0:
+            gen_list = []
+            new_gen = []
+            for person in generation:
+                if isinstance(person, Individual):
+                    if person.upperfam is not None:
+                        new_gen.append(person.upperfam.husband)
+                        new_gen.append(person.upperfam.wife)
+
+                        if person.upperfam.husband is not None:
+                            gen_list.append([
+                                counter, person.upperfam.husband.firstname + '\n' + person.upperfam.husband.lastname
+                            ])
+                        else:
+                            gen_list.append([counter, None])
+                        if person.upperfam.wife is not None:
+                            gen_list.append([
+                                counter + 1, person.upperfam.wife.firstname + '\n' + person.upperfam.wife.lastname
+                            ])
+                        else:
+                            gen_list.append([counter + 1, None])
+
+                counter += 2
+
+            # Add generation to tree if data in generation
+            if len(gen_list) > 0:
+                tree_list.append(gen_list)
+            depth -= 1
+            generation = new_gen
 
         return tree_list
 
