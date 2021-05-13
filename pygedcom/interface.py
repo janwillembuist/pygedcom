@@ -1,4 +1,5 @@
 # External imports
+import random
 import tkinter as tk
 from tkinter import ttk
 from matplotlib import pyplot as plt
@@ -15,8 +16,11 @@ class App(tk.Tk):
         'padding': '0.2i'
     }
 
-    def __init__(self, gedcomfile):
+    def __init__(self):
         super().__init__()
+
+        # The family tree
+        self.tree = None
 
         # Window settings
         self.geometry("1240x720")
@@ -29,8 +33,10 @@ class App(tk.Tk):
         self.rowconfigure(0, weight=5)
         self.rowconfigure(1, weight=1)
 
-        # Load data
-        self.tree = Parser(gedcomfile).build_tree()
+        # Create menubar
+        self.menu = tk.Menu(self)
+        self.menu.add_cascade(label='File', menu=self._buildfilemenu())
+        self.config(menu=self.menu)
 
         # Create subframes
         self.search_frame = SearchFrame(self, **self.FRAME_OPTIONS)
@@ -39,6 +45,37 @@ class App(tk.Tk):
         self.main_frame.grid(column=1, row=0, sticky='nesw')
         self.info_frame = InfoFrame(self, **self.FRAME_OPTIONS)
         self.info_frame.grid(column=1, row=1, sticky='nesw')
+
+    def loaddata(self):
+        pass
+
+    def openexample(self):
+        # Load data
+        self.tree = Parser('../data/555SAMPLE.GED').build_tree()
+
+        # Draw random individual
+        self.draw_individual(random.choice(list(self.tree.individuals_lookup.keys())))
+
+        # Reset
+        self.reset()
+
+    def draw_individual(self, selected):
+        self.tree.selected_individual = self.tree.individuals[self.tree.individuals_lookup[selected]]
+
+        # Update info and main frame
+        self.info_frame.update_callback()
+        self.main_frame.update_callback()
+
+    def reset(self):
+        # Empty search box
+        self.search_frame.sv.set('')
+
+    def _buildfilemenu(self):
+        filemenu = tk.Menu(self.menu, tearoff=0)
+        filemenu.add_command(label='Open...', command=self.loaddata)
+        filemenu.add_command(label='Open example', command=self.openexample)
+        # TODO: add close and save
+        return filemenu
 
 class SearchFrame(ttk.Frame):
     def __init__(self, master, **kwargs):
@@ -81,6 +118,9 @@ class SearchFrame(ttk.Frame):
         self.select_button.grid(column=0, row=2, columnspan=2, sticky='we')
 
     def on_type_callback(self):
+        if self.nametowidget('.').tree is None:
+            # No tree is loaded in yet.
+            return
         self.search_results = self.nametowidget('.').tree.find(self.sv.get())
 
         # Delete all items
@@ -95,14 +135,8 @@ class SearchFrame(ttk.Frame):
         selected = self.treeview_widget.focus()
         selected = self.treeview_widget.item(selected)['values'][0]
 
-        # Find corresponding ID and save in main app
-        # TODO: make this understandable and maybe quicker.
-        self.nametowidget('.').tree.selected_individual = self.nametowidget('.').tree.individuals[
-            self.nametowidget('.').tree.individuals_lookup[selected]]
-
-        # Update info and main frame
-        self.nametowidget('.!infoframe').update_callback()
-        self.nametowidget('.!mainframe').update_callback()
+        # Save in main app
+        self.nametowidget('.').draw_individual(selected)
 
 
 class InfoFrame(ttk.Frame):
