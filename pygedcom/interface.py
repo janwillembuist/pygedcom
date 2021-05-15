@@ -1,7 +1,7 @@
 # External imports
 import random
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
@@ -15,6 +15,7 @@ class App(tk.Tk):
         'relief': 'groove',
         'padding': '0.2i'
     }
+    ANCESTOR_PLOT_DEPTH = 3
 
     def __init__(self):
         super().__init__()
@@ -30,7 +31,7 @@ class App(tk.Tk):
         # Layout
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=5)
-        self.rowconfigure(0, weight=5)
+        self.rowconfigure(0, weight=3)
         self.rowconfigure(1, weight=1)
 
         # Create menubar
@@ -46,18 +47,17 @@ class App(tk.Tk):
         self.info_frame = InfoFrame(self, **self.FRAME_OPTIONS)
         self.info_frame.grid(column=1, row=1, sticky='nesw')
 
-    def loaddata(self):
-        pass
+    def selectdata(self):
+        file = filedialog.askopenfilename()
+        self.opendata(file=file)
 
-    def openexample(self):
+    def opendata(self, file='../data/555SAMPLE.GED'):
         # Load data
-        self.tree = Parser('../data/555SAMPLE.GED').build_tree()
+        self.tree = Parser(file).build_tree()
 
         # Draw random individual
         self.draw_individual(random.choice(list(self.tree.individuals_lookup.keys())))
-
-        # Reset
-        self.reset()
+        self.reset_views()
 
     def draw_individual(self, selected):
         self.tree.selected_individual = self.tree.individuals[self.tree.individuals_lookup[selected]]
@@ -66,15 +66,16 @@ class App(tk.Tk):
         self.info_frame.update_callback()
         self.main_frame.update_callback()
 
-    def reset(self):
+    def reset_views(self):
         # Empty search box
         self.search_frame.sv.set('')
 
     def _buildfilemenu(self):
         filemenu = tk.Menu(self.menu, tearoff=0)
-        filemenu.add_command(label='Open...', command=self.loaddata)
-        filemenu.add_command(label='Open example', command=self.openexample)
-        # TODO: add close and save
+        filemenu.add_command(label='Open...', command=self.selectdata)
+        filemenu.add_command(label='Open example', command=self.opendata)
+        filemenu.add_command(label='Quit', command=self.quit)
+        # TODO: add save when changes can be made
         return filemenu
 
 class SearchFrame(ttk.Frame):
@@ -100,12 +101,12 @@ class SearchFrame(ttk.Frame):
         keyword.focus()
         keyword.grid(column=1, row=0, sticky='we')
 
-        # TODO: double click callback
         columns = ('#1', '#2')
         self.treeview_widget = ttk.Treeview(self, columns=columns, show='headings', name='search_list')
         self.treeview_widget.heading('#1', text='Full name')
         self.treeview_widget.heading('#2', text='Birth date')
         self.treeview_widget.grid(column=0, row=1, columnspan=2, sticky='nsew')
+        self.treeview_widget.bind('<Double-1>', self.select_callback)
 
         # Create scrollbar
         self.scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.treeview_widget.yview)
@@ -131,7 +132,7 @@ class SearchFrame(ttk.Frame):
         for person in self.search_results:
             self.treeview_widget.insert('', 0, values=(person.fullname, person.birthdate))
 
-    def select_callback(self):
+    def select_callback(self, *args):
         selected = self.treeview_widget.focus()
         selected = self.treeview_widget.item(selected)['values'][0]
 
@@ -186,13 +187,19 @@ class MainFrame(ttk.Frame):
         self.fig = plt.Figure()
         self.plotaxis = self.fig.add_subplot(111)
         self.canvas = FigureCanvasTkAgg(self.fig, self)
-        self.toolbar = NavigationToolbar2Tk(self.canvas, self)
+        self.toolbar = NavigationToolbar2Tk(self.canvas, self)  # Maybe ditch toolbar?
         self.canvas.get_tk_widget().pack(fill=tk.BOTH)
 
         # Preconfigure plot window
         self.plotaxis.axis('off')
+        self.fig.canvas.mpl_connect('pick_event', self.onpick)
 
     def update_callback(self):
-        tree = self.nametowidget('.').tree.find_ancestors()
+        tree = self.nametowidget('.').tree.find_ancestors(self.nametowidget('.').ANCESTOR_PLOT_DEPTH)
         treeplt.plot_tree(tree, self.plotaxis)
         self.canvas.draw()
+
+    def onpick(self, event):
+        text = event.artist
+        person = text.get_text().replace('\n', ' ')
+        self.nametowidget('.').draw_individual(person)

@@ -170,7 +170,7 @@ class FamilyTree:
         """
         return self.individuals[self.individuals_lookup[fullname]]
 
-    def find_ancestors(self, depth=5):
+    def find_ancestors(self, depth):
         counter = 1
         tree_list = [[[counter, self.selected_individual.firstname + '\n' + self.selected_individual.lastname]]]
         counter += 1
