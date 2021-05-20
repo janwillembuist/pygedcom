@@ -40,7 +40,7 @@ class Individual:
 
             # Save stuff into class
             if line.startswith('1 NAME'):
-                self.fullname = line[7:].replace('/', '')
+                self.fullname = re.sub(' +', ' ', line[7:].replace('/', ''))
             elif line.startswith('1 SEX'):
                 self.sex = line[6]
             elif line.startswith('1 FAMS'):
@@ -171,10 +171,23 @@ class FamilyTree:
         return self.individuals[self.individuals_lookup[fullname]]
 
     def find_ancestors(self, depth):
-        counter = 1
-        tree_list = [[[counter, self.selected_individual.firstname + '\n' + self.selected_individual.lastname]]]
-        counter += 1
+        """
+        Find ancestry of Individual + husband/wife and children
 
+        :param depth: amount of ancestor layers
+        :return: list of ancestors
+        """
+        if self.selected_individual.lowerfam is not None:
+            if self.selected_individual == self.selected_individual.lowerfam.husband:
+                tree_list = [[[0, child] for child in self.selected_individual.lowerfam.children],
+                             [[1, self.selected_individual], [1, self.selected_individual.lowerfam.wife]]]
+            else:
+                tree_list = [[[0, child] for child in self.selected_individual.lowerfam.children],
+                             [[1, self.selected_individual], [1, self.selected_individual.lowerfam.husband]]]
+        else:
+            tree_list = [[[1, self.selected_individual]]]
+
+        counter = 2
         generation = [self.selected_individual]
 
         while depth != 0:
@@ -188,13 +201,13 @@ class FamilyTree:
 
                         if person.upperfam.husband is not None:
                             gen_list.append([
-                                counter, person.upperfam.husband.firstname + '\n' + person.upperfam.husband.lastname
+                                counter, person.upperfam.husband
                             ])
                         else:
                             gen_list.append([counter, None])
                         if person.upperfam.wife is not None:
                             gen_list.append([
-                                counter + 1, person.upperfam.wife.firstname + '\n' + person.upperfam.wife.lastname
+                                counter + 1, person.upperfam.wife
                             ])
                         else:
                             gen_list.append([counter + 1, None])
