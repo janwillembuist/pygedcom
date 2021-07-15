@@ -40,8 +40,7 @@ def plot_tree(tree, ax=None):
                     size = 18 - (gen_level-1)*2
             except IndexError:
                 size = 18 - (gen_level-1)*2
-            else:
-                x = [0]
+            x = [0]
 
         for person, dx in zip(generation, x):
             if person[1] is not None:
