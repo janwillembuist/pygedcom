@@ -25,7 +25,7 @@ class App(tk.Tk):
 
         # Window settings
         self.geometry("1240x720")
-        self.resizable(width=False, height=False)
+        #self.resizable(width=False, height=False)
         self.title('PyGEDCOM')
 
         # Layout
@@ -37,6 +37,7 @@ class App(tk.Tk):
         # Create menubar
         self.menu = tk.Menu(self)
         self.menu.add_cascade(label='File', menu=self._buildfilemenu())
+        self.menu.add_command(label='Settings', command=self._opensettings) # TODO: settings window
         self.config(menu=self.menu)
 
         # Create subframes
@@ -77,6 +78,9 @@ class App(tk.Tk):
         filemenu.add_command(label='Quit', command=self.quit)
         # TODO: add save when changes can be made
         return filemenu
+
+    def _opensettings(self):
+        print('Hello')
 
 class SearchFrame(ttk.Frame):
     def __init__(self, master, **kwargs):

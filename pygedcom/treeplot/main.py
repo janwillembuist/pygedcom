@@ -18,17 +18,30 @@ def plot_tree(tree, ax=None):
 
     for generation in tree:
         gen_level += 1
-        person_amount = len(generation) #2 ** (gen_level-1)
+        person_amount = len(generation)
         if person_amount > 1:
             if generation[0][0] == 0:
+                # Kid generation
                 x = np.linspace(-scaling(person_amount), scaling(person_amount), person_amount)
                 size = 14
+            elif generation[0][0] == 1:
+                # Parents
+                x = [0, 1]
             else:
+                # Elders
                 x = np.linspace(-scaling(gen_level), scaling(gen_level), person_amount)
                 size = 18 - (gen_level-1)*2
         else:
-            size = 18 - (gen_level-1)*2
-            x = [0]
+            try:
+                level = generation[0][0]
+                if level == 0:
+                    size = 14
+                else:
+                    size = 18 - (gen_level-1)*2
+            except IndexError:
+                size = 18 - (gen_level-1)*2
+            else:
+                x = [0]
 
         for person, dx in zip(generation, x):
             if person[1] is not None:
