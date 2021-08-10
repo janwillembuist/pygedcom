@@ -12,7 +12,7 @@ from pygedcom.gedcomparser import Parser
 class App(tk.Tk):
     FRAME_OPTIONS = {
         'borderwidth': 1,
-        'relief': 'groove',
+        # 'relief': 'groove',
         'padding': '0.2i'
     }
     ANCESTOR_PLOT_DEPTH = 3
@@ -25,8 +25,13 @@ class App(tk.Tk):
 
         # Window settings
         self.geometry("1240x720")
-        #self.resizable(width=False, height=False)
+        # self.resizable(width=False, height=False)
         self.title('PyGEDCOM')
+        self.option_add('*tearOff', False)
+
+        self.style = ttk.Style(self)
+        self.tk.call('source', '../data/themes/forest-light.tcl')
+        self.style.theme_use('forest-light')
 
         # Layout
         self.columnconfigure(0, weight=1)
@@ -37,7 +42,7 @@ class App(tk.Tk):
         # Create menubar
         self.menu = tk.Menu(self)
         self.menu.add_cascade(label='File', menu=self._buildfilemenu())
-        self.menu.add_command(label='Settings', command=self._opensettings) # TODO: settings window
+        self.menu.add_command(label='Settings', command=self._opensettings)
         self.config(menu=self.menu)
 
         # Create subframes
@@ -80,6 +85,7 @@ class App(tk.Tk):
         return filemenu
 
     def _opensettings(self):
+        # TODO: settings window
         print('Hello')
 
 class SearchFrame(ttk.Frame):
@@ -119,7 +125,7 @@ class SearchFrame(ttk.Frame):
         # Couple scrollbar
         self.treeview_widget.configure(yscrollcommand=self.scrollbar.set)
 
-        self.select_button = ttk.Button(self, text='Select person', command=self.select_callback)
+        self.select_button = ttk.Button(self, text='Select person', command=self.select_callback, style='Accent.TButton')
         self.select_button.grid(column=0, row=2, columnspan=2, sticky='we')
 
     def on_type_callback(self):
@@ -191,7 +197,7 @@ class MainFrame(ttk.Frame):
         self.fig = plt.Figure()
         self.plotaxis = self.fig.add_subplot(111)
         self.canvas = FigureCanvasTkAgg(self.fig, self)
-        self.toolbar = NavigationToolbar2Tk(self.canvas, self)  # Maybe ditch toolbar?
+        # self.toolbar = NavigationToolbar2Tk(self.canvas, self)  # Maybe ditch toolbar?
         self.canvas.get_tk_widget().pack(fill=tk.BOTH)
 
         # Preconfigure plot window

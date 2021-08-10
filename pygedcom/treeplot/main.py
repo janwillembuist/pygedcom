@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 
 BBOX = {
     'boxstyle': 'square',
-    'fc': 'lightblue'
+    'fc': '#80AF95'
 }
 
 def plot_tree(tree, ax=None):
