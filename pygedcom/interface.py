@@ -41,6 +41,11 @@ class App(tk.Tk):
         self.rowconfigure(1, weight=80)
         self.rowconfigure(2, weight=30)
 
+
+        # Add sidegrip
+        self.sg = ttk.Sizegrip(self)
+        self.sg.grid(row=2, column=2, sticky=tk.SE)
+
         # Create subframes
         self.menu_frame = MenuButtons(self, **self.FRAME_OPTIONS)
         self.menu_frame.grid(column=0, row=0, columnspan=2, sticky='nesw')
