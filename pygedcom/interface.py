@@ -12,8 +12,7 @@ from pygedcom.gedcomparser import Parser
 class App(tk.Tk):
     FRAME_OPTIONS = {
         'borderwidth': 1,
-        # 'relief': 'groove',
-        'padding': '0.2i'
+        'padding': '0.15i'
     }
     ANCESTOR_PLOT_DEPTH = 3
 
@@ -28,6 +27,8 @@ class App(tk.Tk):
         # self.resizable(width=False, height=False)
         self.title('PyGEDCOM')
         self.option_add('*tearOff', False)
+        self.overrideredirect(True)
+        # self.attributes('-topmost', 1)
 
         self.style = ttk.Style(self)
         self.tk.call('source', '../data/themes/forest-light.tcl')
@@ -36,22 +37,19 @@ class App(tk.Tk):
         # Layout
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=5)
-        self.rowconfigure(0, weight=3)
-        self.rowconfigure(1, weight=1)
-
-        # Create menubar
-        self.menu = tk.Menu(self)
-        self.menu.add_cascade(label='File', menu=self._buildfilemenu())
-        self.menu.add_command(label='Settings', command=self._opensettings)
-        self.config(menu=self.menu)
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=80)
+        self.rowconfigure(2, weight=30)
 
         # Create subframes
+        self.menu_frame = MenuButtons(self, **self.FRAME_OPTIONS)
+        self.menu_frame.grid(column=0, row=0, columnspan=2, sticky='nesw')
         self.search_frame = SearchFrame(self, **self.FRAME_OPTIONS)
-        self.search_frame.grid(column=0, row=0, rowspan=2, sticky='nesw')
+        self.search_frame.grid(column=0, row=1, rowspan=2, sticky='nesw')
         self.main_frame = MainFrame(self, **self.FRAME_OPTIONS)
-        self.main_frame.grid(column=1, row=0, sticky='nesw')
+        self.main_frame.grid(column=1, row=1, sticky='nesw')
         self.info_frame = InfoFrame(self, **self.FRAME_OPTIONS)
-        self.info_frame.grid(column=1, row=1, sticky='nesw')
+        self.info_frame.grid(column=1, row=2, sticky='nesw')
 
     def selectdata(self):
         file = filedialog.askopenfilename()
@@ -66,6 +64,8 @@ class App(tk.Tk):
         self.reset_views()
 
     def draw_individual(self, selected):
+        if selected == 'random':
+            selected = random.choice(list(self.tree.individuals_lookup.keys()))
         self.tree.selected_individual = self.tree.individuals[self.tree.individuals_lookup[selected]]
 
         # Update info and main frame
@@ -76,17 +76,58 @@ class App(tk.Tk):
         # Empty search box
         self.search_frame.sv.set('')
 
-    def _buildfilemenu(self):
-        filemenu = tk.Menu(self.menu, tearoff=0)
-        filemenu.add_command(label='Open...', command=self.selectdata)
-        filemenu.add_command(label='Open example', command=self.opendata)
-        filemenu.add_command(label='Quit', command=self.quit)
-        # TODO: add save when changes can be made
-        return filemenu
 
-    def _opensettings(self):
-        # TODO: settings window
-        print('Hello')
+class MenuButtons(ttk.Frame):
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
+
+        # Layout
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.columnconfigure(2, weight=10)
+        self.rowconfigure(0, weight=1)
+
+        # Move coordinates
+        self.x = None
+        self.y = None
+
+        self.file = ttk.Button(self, text="Open..", command=self.selectdata)
+        self.file.grid(column=0, row=0, sticky='w')
+        self.defaultfile = ttk.Button(self, text="Open example", command=self.opendata)
+        self.defaultfile.grid(column=1, row=0, sticky='w')
+        self.close = ttk.Button(self, text="Close", command=self.quit, style='Accent.TButton')
+        self.close.grid(column=2, row=0, sticky='e')
+
+        self.bind("<ButtonPress-1>", self.start_move)
+        #self.bind("<ButtonRelease-1>", self.stop_move)
+        self.bind("<B1-Motion>", self.do_move)
+
+    def start_move(self, event):
+        self.x = event.x
+        self.y = event.y
+
+    def stop_move(self):
+        self.x = None
+        self.y = None
+
+    def do_move(self, event):
+        deltax = event.x - self.x
+        deltay = event.y - self.y
+        x = self.nametowidget('.').winfo_x() + deltax
+        y = self.nametowidget('.').winfo_y() + deltay
+        self.nametowidget('.').geometry(f"+{x}+{y}")
+
+    def selectdata(self):
+        file = filedialog.askopenfilename()
+        self.opendata(file=file)
+
+    def opendata(self, file='../data/555SAMPLE.GED'):
+        # Load data
+        self.nametowidget('.').tree = Parser(file).build_tree()
+
+        # Draw random individual
+        self.nametowidget('.').draw_individual('random')
+        self.nametowidget('.').reset_views()
 
 class SearchFrame(ttk.Frame):
     def __init__(self, master, **kwargs):
