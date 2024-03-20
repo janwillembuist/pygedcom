@@ -1,5 +1,6 @@
 import re
 
+
 class Individual:
     def __init__(self, gedcomlines):
         # TODO: more info!
@@ -95,8 +96,10 @@ class Family:
                 newkids.append(individuals[child])
             self.children = newkids
 
+
 class FamilyTree:
     """Pygedcom's representation of a family tree."""
+
     def __init__(self):
         # key: ID, value: Individual/Family
         self.individuals = {}
@@ -130,7 +133,7 @@ class FamilyTree:
         # Add number if this fullname is allready in the lookup table
         i = 1
         while self.individuals[person_id].fullname in self.individuals_lookup:
-            if self.individuals[person_id].fullname.endswith('({})'.format(i-1)):
+            if self.individuals[person_id].fullname.endswith('({})'.format(i - 1)):
                 # Delete previous number
                 self.individuals[person_id].fullname = self.individuals[person_id].fullname[:-4]
                 self.individuals[person_id].lastname = self.individuals[person_id].lastname[:-4]
@@ -228,4 +231,3 @@ class FamilyTree:
 
         for ind_id, individual in self.individuals.items():
             self.individuals[ind_id].serialize_individual(self.families)
-

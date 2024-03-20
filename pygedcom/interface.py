@@ -9,6 +9,7 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationTool
 from pygedcom import treeplot as treeplt
 from pygedcom.gedcomparser import Parser
 
+
 class App(tk.Tk):
     FRAME_OPTIONS = {
         'borderwidth': 1,
@@ -40,7 +41,6 @@ class App(tk.Tk):
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=80)
         self.rowconfigure(2, weight=30)
-
 
         # Add sidegrip
         self.sg = ttk.Sizegrip(self)
@@ -104,7 +104,7 @@ class MenuButtons(ttk.Frame):
         self.close.grid(column=2, row=0, sticky='e')
 
         self.bind("<ButtonPress-1>", self.start_move)
-        #self.bind("<ButtonRelease-1>", self.stop_move)
+        # self.bind("<ButtonRelease-1>", self.stop_move)
         self.bind("<B1-Motion>", self.do_move)
 
     def start_move(self, event):
@@ -133,6 +133,7 @@ class MenuButtons(ttk.Frame):
         # Draw random individual
         self.nametowidget('.').draw_individual('random')
         self.nametowidget('.').reset_views()
+
 
 class SearchFrame(ttk.Frame):
     def __init__(self, master, **kwargs):
@@ -171,7 +172,8 @@ class SearchFrame(ttk.Frame):
         # Couple scrollbar
         self.treeview_widget.configure(yscrollcommand=self.scrollbar.set)
 
-        self.select_button = ttk.Button(self, text='Select person', command=self.select_callback, style='Accent.TButton')
+        self.select_button = ttk.Button(self, text='Select person', command=self.select_callback,
+                                        style='Accent.TButton')
         self.select_button.grid(column=0, row=2, columnspan=2, sticky='we')
 
     def on_type_callback(self):
@@ -234,6 +236,7 @@ class InfoFrame(ttk.Frame):
         self.sex.set(individual.sex)
         self.birthdate.set(individual.birthdate)
         self.deathdate.set(individual.deathdate)
+
 
 class MainFrame(ttk.Frame):
     def __init__(self, master, **kwargs):

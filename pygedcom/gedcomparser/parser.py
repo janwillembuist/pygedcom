@@ -1,7 +1,9 @@
 from pygedcom.gedcomparser.elements import FamilyTree
 
+
 class Parser:
     """Parses the raw gedcom file into a Pygedcom FamilyTree instance"""
+
     def __init__(self, file):
         with open(file, mode='r', encoding='utf-8-sig') as f:
             self.lines = f.readlines()
@@ -20,10 +22,10 @@ class Parser:
         for i, (line, title) in enumerate(self.separators):
             if 'INDI' in title:
                 # Add inidividual to the tree with this part of the file
-                tree.add_individual(self.lines[line:self.separators[i+1][0]])
+                tree.add_individual(self.lines[line:self.separators[i + 1][0]])
             elif 'FAM' in title:
                 # Add family to the tree with this part of the file
-                tree.add_family(self.lines[line:self.separators[i+1][0]])
+                tree.add_family(self.lines[line:self.separators[i + 1][0]])
 
         # Serialize tree
         tree.serialize()
